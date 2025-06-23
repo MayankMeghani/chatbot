@@ -1,3 +1,8 @@
+from rag.retriever import DocumentRetriever
+from rag.generator import AnswerGenerator
+from rag.models import get_embedding_model,get_pandas_agent
+from rag.vectorstore import get_vector_store
+from rag.pipelines import RAGPipeline
 from typing import Dict
 
 from fastapi import FastAPI, HTTPException, Depends
@@ -52,10 +57,11 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 # Example protected endpoint: Only accessible to engineering and c_level
-@app.get("/engineering-data")
-def get_engineering_data(current_user: Dict = Depends(get_current_user)):
-    if current_user["role"] not in ["engineering", "c_level"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    return {
-        "message": f"Welcome {current_user['username']}! Here is your engineering data."
-    }
+@app.get("/chatbot")
+def chatbot(current_user: Dict = Depends(get_current_user)):
+    embedding = get_embedding_model()
+    vector_store = get_vector_store(embedding)
+    pandas_agent = get_pandas_agent() 
+    retriever = DocumentRetriever(vector_store)
+    generator = AnswerGenerator()
+    pipeline = RAGPipeline(retriever, generator, pandas_agent)

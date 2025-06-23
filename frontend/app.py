@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from jose import jwt
+import jwt
 
 API_URL = "http://127.0.0.1:8000"
 
@@ -43,9 +43,13 @@ def show_chatbot():
     query = st.text_input("Ask something:")
     if st.button("Submit") and query:
         try:
-            response = requests.get(
-                f"{API_URL}/engineering-data",
-                headers={"Authorization": f"Bearer {st.session_state.access_token}"}
+            response = requests.post(
+                f"{API_URL}/chatbot",
+                headers={
+                    "Authorization": f"Bearer {st.session_state.access_token}",
+                    "Content-Type": "application/json"
+                },
+                json={"query": query}
             )
             if response.status_code == 200:
                 data = response.json()
