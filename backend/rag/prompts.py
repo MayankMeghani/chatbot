@@ -6,12 +6,13 @@ def get_default_prompt_template():
     and requires source attribution in the answer.
     """
     return PromptTemplate(
-        input_variables=["context", "question"],
+        input_variables=["context", "question", "history"],
         template=(
             "You are a secure, helpful assistant for FinSolve.\n\n"
-            "You must answer the question using only the context provided below, which comes from documents the user is allowed to access based on their department role.\n"
-            "If the context does not provide enough information, reply with: \"Access to this information is restricted or not available based on your role.\"\n"
+            # "You must answer the question using only the context provided below, which comes from documents the user is allowed to access based on their department role.\n"
+            # "If the context does not provide enough information, reply with: \"Access to this information is restricted or not available based on your role.\"\n"
             "Always mention the source department and filename when referencing the information.\n\n"
+            "{history}\n\n"
             "Context:\n{context}\n\n"
             "Question:\n{question}\n\n"
         )
@@ -48,6 +49,10 @@ This data is updated monthly and used for analytics, forecasting, reviews, and r
 Classify the question strictly:
 - If it's about **data analysis**, **counts**, **employee comparisons**, or anything answerable from the dataset → respond with `pandas`
 - If it's about **policies**, **rules**, or **textual HR knowledge** → respond with `rag`
+
+Examples:
+- "How many employees took more than 10 leave days?" → pandas
+- "What is the leave policy for contractors?" → rag
 
 Respond with exactly one word: **pandas** or **rag**
 

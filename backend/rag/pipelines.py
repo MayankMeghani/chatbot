@@ -1,10 +1,11 @@
+
 class RAGPipeline:
     def __init__(self, retriever, generator, pandas_agent):
         self.retriever = retriever
         self.generator = generator
         self.pandas_agent = pandas_agent
 
-    def run(self, query: str, user_role: str):
+    def run(self, query: str, user_role: str, session_id: str):
         route = self.retriever.decide_execution_path(query, user_role)
 
         if route == "pandas":
@@ -20,7 +21,7 @@ class RAGPipeline:
 
             if retrieval_result["status"] == "ok":
                 docs = self.retriever.format_results(retrieval_result["docs"])
-                answer = self.generator.generate_answer(query, docs)
+                answer = self.generator.generate_answer(query, docs,session_id)
                 return {
                     "mode": "rag",
                     "status": "ok",

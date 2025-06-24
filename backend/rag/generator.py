@@ -3,43 +3,59 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableSequence
 from rag.models import get_llm
 from rag.prompts import get_default_prompt_template
-
+from langchain_core.runnables import RunnableWithMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 class AnswerGenerator:
-    def __init__(self, llm=None, prompt_template=None,parser=None):
-        # Initialize logger
+    def __init__(self, llm=None, prompt_template=None, parser=None):
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(level=logging.INFO)
-
-        self.llm = llm or get_llm("gpt-4o", temperature=0.2)
+        self.memory_registry = {}
+        self.llm = llm or get_llm()
         self.prompt_template = prompt_template or get_default_prompt_template()
         self.parser = parser or StrOutputParser()
 
-        # Set up the invocation sequence
-        self.generator_chain = RunnableSequence(self.prompt_template | self.llm | self.parser)
+        # Base chain
+        self.base_chain = RunnableSequence(self.prompt_template | self.llm | self.parser)
 
-    def generate_answer(self, question: str, docs: list):
-        """
-        Generate an answer using the provided question and context from documents.
-        
-        Args:
-            question (str): The question to answer.
-            docs (list): List of documents providing context.
+        # Memory-aware chain
+        self.chain_with_memory = RunnableWithMessageHistory(
+            self.base_chain,
+            self.get_user_memory,  
+            input_messages_key="question",     
+            history_messages_key="history"
+        )
 
-        Returns:
-            str: Generated answer.
-        """
+    def get_user_memory(self,session_id: str):
+        if session_id not in self.memory_registry:
+            self.memory_registry[session_id] = ChatMessageHistory()
+        return self.memory_registry[session_id]
+
+    def reset_memory(self, session_id: str):
+        if session_id in self.memory_registry:
+            del self.memory_registry[session_id]
+
+    def generate_answer(self, question: str, docs: list, session_id: str):
         try:
             if not isinstance(docs, list):
                 raise ValueError("Documents must be provided as a list.")
-            
+
             context = "\n\n".join([
-                f"Source: {doc.page_content}\n{doc.metadata['source']}\n" 
+                f"Source: {doc.page_content}\n{doc.metadata['source']}" 
                 for doc in docs if doc.page_content
             ])
 
+            # Must match prompt template keys
+            inputs = {
+                "context": context,
+                "question": question
+            }
 
-            return self.generator_chain.invoke({"context": context, "question": question})
+            return self.chain_with_memory.invoke(
+                inputs,
+                config={"configurable": {"session_id": session_id}}  # ✅ required
+            )
+
         except Exception as e:
             self.logger.error(f"Error generating answer: {e}")
             return None
