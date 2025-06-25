@@ -2,7 +2,7 @@ from retriever import DocumentRetriever
 from generator import AnswerGenerator
 from models import get_embedding_model,get_pandas_agent
 from vectorstore import get_vector_store
-from pipelines import RAGPipeline
+from backend.rag.router_pipeline import RAGPipeline
 def main():
     embedding = get_embedding_model()
     vector_store = get_vector_store(embedding)

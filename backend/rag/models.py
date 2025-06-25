@@ -30,6 +30,7 @@ def get_pandas_agent():
     return create_pandas_dataframe_agent(
         llm=get_llm(),
         df=dataframe,
+        agent_type="openai-tools",
         **{"allow_dangerous_code": True} 
     )
 

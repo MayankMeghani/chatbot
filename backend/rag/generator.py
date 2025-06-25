@@ -4,16 +4,16 @@ from langchain_core.runnables import RunnableSequence
 from rag.models import get_llm
 from rag.prompts import get_default_prompt_template
 from langchain_core.runnables import RunnableWithMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
 
 class AnswerGenerator:
-    def __init__(self, llm=None, prompt_template=None, parser=None):
+    def __init__(self,memory_store, llm=None, prompt_template=None, parser=None):
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(level=logging.INFO)
         self.memory_registry = {}
         self.llm = llm or get_llm()
         self.prompt_template = prompt_template or get_default_prompt_template()
         self.parser = parser or StrOutputParser()
+        self.memory_store = memory_store
 
         # Base chain
         self.base_chain = RunnableSequence(self.prompt_template | self.llm | self.parser)
@@ -21,20 +21,12 @@ class AnswerGenerator:
         # Memory-aware chain
         self.chain_with_memory = RunnableWithMessageHistory(
             self.base_chain,
-            self.get_user_memory,  
-            input_messages_key="question",     
+            lambda session_id: self.memory_store.get_history(session_id),
+            input_messages_key="question",
             history_messages_key="history"
         )
-
-    def get_user_memory(self,session_id: str):
-        if session_id not in self.memory_registry:
-            self.memory_registry[session_id] = ChatMessageHistory()
-        return self.memory_registry[session_id]
-
-    def reset_memory(self, session_id: str):
-        if session_id in self.memory_registry:
-            del self.memory_registry[session_id]
-
+        
+        
     def generate_answer(self, question: str, docs: list, session_id: str):
         try:
             if not isinstance(docs, list):

@@ -58,3 +58,26 @@ Respond with exactly one word: **pandas** or **rag**
 
 Question: {{input}}
 """)
+
+def get_pandas_agent_prompt():
+    return PromptTemplate.from_template("""
+Given the past conversation and the current query, rewrite the user’s question clearly and unambiguously.
+
+Chat History:
+{chat_history}
+
+Current Question:
+{question}
+
+Rewritten Query:
+""")
+    
+def get_format_prompt():
+    return PromptTemplate.from_template("""
+You are a helpful assistant. Format the following output into a clean, readable response.
+
+Original Query: {query}
+Agent Output: {raw_output}
+
+Final Answer:
+""")
