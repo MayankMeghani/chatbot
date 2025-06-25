@@ -23,14 +23,13 @@ def initialize_pipeline():
     retriever = DocumentRetriever(vector_store)
     generator = AnswerGenerator(memory_store)
     rag_pipeline = RAGPipeline(retriever, generator)
-    df = pd.read_csv("../resources/data/hr/hr_data.csv")
-    pandas_pipeline = PandasPipeline(dataframe=df)
+    pandas_pipeline = PandasPipeline()
     router_pipeline = RouterPipeline(rag_pipeline, pandas_pipeline)
 
-    app.state.embedding = embedding_model
-    app.state.vector_store = vector_store
+    # app.state.embedding = embedding_model
+    # app.state.vector_store = vector_store
     app.state.memory_store = memory_store
-    app.state.retriever = retriever
-    app.state.generator = generator
+    # app.state.retriever = retriever
+    # app.state.generator = generator
     app.state.router_pipeline = router_pipeline
     print("RAG pipeline initialized successfully.")
