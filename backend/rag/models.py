@@ -15,7 +15,7 @@ if 'OPENAI_API_KEY' not in os.environ:
 def get_embedding_model(model_name="text-embedding-3-small"):
     return OpenAIEmbeddings(model=model_name)
 
-def get_llm(model_name="gpt-4o",temperature=0.2):
+def get_llm(model_name="gpt-4o",temperature=0.5):
     return ChatOpenAI(model=model_name, temperature=temperature)
 
 def get_chat_model():

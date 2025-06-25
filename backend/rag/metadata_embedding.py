@@ -2,40 +2,46 @@ from langchain_core.documents import Document
 from models import get_embedding_model
 from vectorstore import get_vector_store
 department_docs = [
-    Document(page_content="""Documents FinSolve’s complete technical architecture
-            - Documents FinSolve’s complete technical architecture and engineering processes.
-            - Includes microservices, CI/CD pipelines, security models, and compliance (GDPR, DPDP, PCI-DSS).
-            - Covers development standards, DevOps practices, monitoring, and future tech roadmap (AI, blockchain).
-            - Owned by the Engineering Team; updated quarterly.
-            - Access is restricted to Engineering Team and C-Level Executives due to high sensitivity.
-            - Serves as a reference for audits, onboarding, scaling, and system maintenance.""", metadata={"department": "engineering"}),
-    Document(page_content="""Documents FinSolve’s quarterly financial performance
-            - Documents FinSolve’s quarterly financial performance for the year 2024.
-            - Includes revenue, income, gross margin, marketing spend, vendor costs, and cash flow data.
-            - Provides detailed expense breakdowns and risk mitigation strategies for each quarter.
-            - Owned by the Finance Team; updated quarterly.
-            - Access is restricted to the Finance Team and C-Level Executives due to financial sensitivity.
-            - Serves as a key reference for financial planning, audits, investor reporting, and strategic decisions.""", metadata={"department": "finance"}),
-    Document(page_content="""Documents FinSolve’s marketing strategies and campaigns
-            - Includes campaign overviews, spend allocations, customer acquisition targets, revenue projections, conversion and ROI benchmarks.
-            - Provides detailed highlights on digital marketing, B2B initiatives, customer retention programs, and preliminary performance analysis.
-            - Owned by the Marketing Team; refreshed quarterly.
-            - Serves as a key reference for quarterly planning, budget allocation, performance reviews, and Q1 2025 strategy recommendations.""", metadata={"department": "marketing"}),
-    Document(page_content="""Documents FinSolve’s HR policies and procedures
-             - Documents HR’s employee dataset, covering 100 records with demographics, employment, compensation, leave, attendance, and performance fields.
-            - Provides workforce composition insights, turnover tracking, leave utilization, and performance trend analysis.
-            - Owned by the HR & People Analytics team; refreshed monthly to capture hires, exits, and updates.
-            - Serves as a key reference for talent forecasting, compensation reviews, compliance reporting, and employee engagement initiatives.""", metadata={"department": "hr"}),
-    Document(page_content="""Documents FinSolve’s general company policies and procedures
-            - Comprehensive company policies covering onboarding & benefits, leave policies, work hours & attendance, code of conduct & workplace behavior, health & safety, compensation & payroll, reimbursement, training & development, performance & feedback, privacy & data security, exit procedures, FAQs, and miscellaneous guidelines.
-            - Purpose: Serves as the authoritative guide for employees on company vision, values, HR processes, legal compliance, and workplace standards.
-            - Ownership & Maintenance: Owned by the Human Resources Department; reviewed and updated annually or as regulations and company practices.
-            - Usage: Key reference for new-hire orientation, policy clarifications, leave & attendance management, performance reviews, and exit procedures.""", metadata={"department": "general"})
-    ]
+    Document(
+    page_content="""This document provides a high-level overview of FinSolve’s Engineering practices and technology stack.
+    - Covers the architecture of microservices, CI/CD pipelines, security protocols, and compliance initiatives (GDPR, DPDP, PCI-DSS).
+    - Introduces development workflows, DevOps culture, monitoring strategies, and the tech roadmap involving AI and blockchain.
+    - Intended for technical awareness and onboarding support across departments.""",
+    metadata={"department": "general"}
+    ),
+    Document(
+    page_content="""This document summarizes FinSolve’s Finance department structure and reporting approach.
+    - Includes a general overview of quarterly performance reporting, budgeting, and strategic expense allocation.
+    - Introduces key financial metrics tracked across the business such as revenue, margins, and cost efficiency.
+    - Serves as a reference for understanding financial operations, useful to employees across roles.""",
+    metadata={"department": "general"}
+    ),
+    Document(
+    page_content="""This document offers an accessible summary of FinSolve’s official Employee Handbook for all employees.
+    - Describes onboarding procedures, benefit eligibility, and leave types.
+    - Details work hour expectations, attendance norms, and behavior guidelines.
+    - Explains payroll policies, reimbursements, performance reviews, training, and feedback mechanisms.
+    - Highlights company values, vision, legal compliance practices, and data security expectations.
+    - Serves as a go-to reference for any employee seeking clarity on HR policies or workplace standards.""",
+    metadata={"department": "general"}
+        ),
+    Document(
+        page_content="""This document introduces how the HR department uses data to support people strategy and transparency.
+        - Outlines the types of data collected: demographics, employment records, leave and attendance, performance ratings, etc.
+        - Explains how trends in employee engagement, attrition, or leave utilization are monitored.
+        - Describes how HR data supports talent planning, compliance tracking, and decision-making.
+        - Helpful for employees interested in understanding how HR analytics inform policies and initiatives.""",metadata={"department": "general"}
+        ),
+    Document(
+        page_content="""This overview introduces FinSolve’s HR data-driven practices and employee engagement tracking.
+            - Summarizes how HR monitors leave usage, performance scores, and headcount trends.
+            - Explains how these metrics support forecasting, compliance, and workforce planning.
+            - Aims to build transparency on how HR decisions are informed.""", metadata={"department": "general"}
+        )]
 
 
 embedding_model = get_embedding_model()
-vector_store = get_vector_store(embedding_model, collection_name="metadata", persist_directory="chroma_db")
+vector_store = get_vector_store(embedding_model, collection_name="documents", persist_directory="chroma_db")
 
 def add_documents_to_vector_store(docs):
     """

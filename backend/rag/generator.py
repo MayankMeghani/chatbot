@@ -33,9 +33,11 @@ class AnswerGenerator:
                 raise ValueError("Documents must be provided as a list.")
 
             context = "\n\n".join([
-                f"Source: {doc.page_content}\n{doc.metadata['source']}" 
-                for doc in docs if doc.page_content
+                f"Source: {doc.page_content}\n{doc.metadata['source']}"
+                for doc in docs
+                if doc.page_content and "source" in doc.metadata
             ])
+
 
             # Must match prompt template keys
             inputs = {
@@ -45,7 +47,7 @@ class AnswerGenerator:
 
             return self.chain_with_memory.invoke(
                 inputs,
-                config={"configurable": {"session_id": session_id}}  # ✅ required
+                config={"configurable": {"session_id": session_id} }  
             )
 
         except Exception as e:
