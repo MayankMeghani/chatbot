@@ -19,14 +19,13 @@ if 'query_input' not in st.session_state:
 st.set_page_config(page_title="FinSolve Chatbot", page_icon="💬", layout="wide")
 
 def show_login():
-    st.title("🔐 Login")
+    st.title("🔐 Login / Sign Up")
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        st.markdown("### Welcome to FinSolve Chatbot")
-        username = st.text_input("Username", placeholder="Enter your username")
-        password = st.text_input("Password", type="password", placeholder="Enter your password")
+    tab_login, tab_signup = st.tabs(["Login", "Sign Up"])
+
+    with tab_login:
+        username = st.text_input("Username", key="login_username")
+        password = st.text_input("Password", type="password", key="login_password")
         
         if st.button("Login", use_container_width=True):
             if username and password:
@@ -46,11 +45,40 @@ def show_login():
                         st.success("Login successful!")
                         st.rerun()
                     else:
-                        st.error("Login failed. Please check your credentials.")
+                        st.error("Login failed. Check credentials.")
                 except Exception as e:
                     st.error(f"Connection error: {e}")
             else:
-                st.warning("Please enter both username and password.")
+                st.warning("Enter both username and password.")
+
+    with tab_signup:
+        new_username = st.text_input("New Username", key="signup_username")
+        new_password = st.text_input("New Password", type="password", key="signup_password")
+        department = st.selectbox("Select Department", [
+            "finance", "marketing", "hr", "engineering", "C-Level", "employee"
+        ])
+
+        if st.button("Create Account", use_container_width=True):
+            if new_username and new_password:
+                try:
+                    res = requests.post(
+                        f"{API_URL}/signup",
+                        json={
+                            "username": new_username,
+                            "password": new_password,
+                            "role": department
+                        }
+                    )
+                    if res.status_code == 200:
+                        st.success("Account created! You can now login.")
+                    elif res.status_code == 409:
+                        st.error("Username already exists.")
+                    else:
+                        st.error("Signup failed.")
+                except Exception as e:
+                    st.error(f"Signup error: {e}")
+            else:
+                st.warning("All fields are required.")
 
 def show_chatbot():
     st.title("🤖 FinSolve Chatbot")
