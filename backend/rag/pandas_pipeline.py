@@ -26,24 +26,34 @@ class PandasPipeline:
         # Get session memory
         history = self.memory_store.get_history(session_id)
         history_text = get_buffer_string(history.messages)
-
+        print(f"Chat History: {history_text}")
+        
         # Stage 1: Rewrite query using chat history
         rewritten_query = self.rewriter_chain.invoke({
             "question": query,
             "chat_history": history_text
         })
-
+        
+        
         # Stage 2: Query the dataframe
         try:
-            agent_result = self.pandas_agent.invoke(rewritten_query)
+            # Pass the string directly to the pandas agent
+            agent_result = self.pandas_agent.invoke({"input": rewritten_query})
+            
+            # Extract the output if it's in a structured format
+            if isinstance(agent_result, dict) and 'output' in agent_result:
+                agent_result = agent_result['output']
         except Exception as e:
             agent_result = f"Agent failed: {e}"
 
+        print(f"Agent Result: {agent_result}")
+        
         # Stage 3: Format final output
         final_response = self.formatter_chain.invoke({
             "query": query,
             "raw_output": agent_result
         })
+        
 
         # Update memory
         history.add_user_message(query)

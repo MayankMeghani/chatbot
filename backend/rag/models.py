@@ -32,7 +32,7 @@ def get_pandas_agent(base_model=None,dataframe=None):
     if dataframe.empty:
         raise ValueError("HR dataset is empty")
     return create_pandas_dataframe_agent(
-        llm= base_model |get_llm(),
+        llm= base_model or get_llm(),
         df=dataframe,
         agent_type="openai-tools",
         **{"allow_dangerous_code": True} 
