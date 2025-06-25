@@ -23,12 +23,16 @@ def get_chat_model():
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     return ConversationChain(llm=llm, memory=memory, verbose=False)
 
-def get_pandas_agent():
-    dataframe = pd.read_csv("../resources/data/hr/hr_data.csv")
+def get_pandas_agent(base_model=None,dataframe=None):
+    if dataframe is None:
+        try:
+            dataframe = pd.read_csv("../resources/data/hr/hr_data.csv")
+        except FileNotFoundError:
+            raise ValueError("No dataframe provided and default CSV not found")
     if dataframe.empty:
         raise ValueError("HR dataset is empty")
     return create_pandas_dataframe_agent(
-        llm=get_llm(),
+        llm= base_model |get_llm(),
         df=dataframe,
         agent_type="openai-tools",
         **{"allow_dangerous_code": True} 

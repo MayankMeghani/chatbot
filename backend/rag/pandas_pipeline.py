@@ -5,7 +5,7 @@ from rag.models import get_llm, get_pandas_agent
 from rag.prompts import get_pandas_agent_prompt, get_format_prompt
 
 class PandasPipeline:
-    def __init__(self, dataframe, memory_store: MemoryStore = None, llm=None):
+    def __init__(self, dataframe=None, memory_store: MemoryStore = None, llm=None):
         self.llm = llm or get_llm()
         self.df = dataframe
         self.memory_store = memory_store or MemoryStore()
@@ -16,7 +16,7 @@ class PandasPipeline:
         self.rewriter_chain = RunnableSequence(self.rewrite_prompt | self.llm | self.parser)
 
         # Stage 2: Pandas Agent (LangChain agent using df)
-        self.pandas_agent = get_pandas_agent()
+        self.pandas_agent = get_pandas_agent(dataframe=self.df, base_model=self.llm)
 
         # Stage 3: Output Formatter
         self.format_prompt = get_format_prompt()
