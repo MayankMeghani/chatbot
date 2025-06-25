@@ -3,7 +3,7 @@ import requests
 import jwt
 from datetime import datetime
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = "https://chatbot-pct9.onrender.com"
 
 # Initialize all session state variables at the very top
 if 'access_token' not in st.session_state:
