@@ -120,7 +120,7 @@ streamlit run app.py
 ## 🚀 Deployment
 
 * Backend hosted on **Render**: `https://chatbot-pct9.onrender.com`
-* Frontend runs with Streamlit; can be deployed to **Streamlit Cloud** or **Railway**.
+* Frontend deployed on **Streamlit Cloud**: `https://finsolve.streamlit.app/`
 
 ---
 
